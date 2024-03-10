@@ -1,0 +1,153 @@
+#! /usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'readline'
+
+# ヒストリファイル名を書くと保存します
+# HISTORY_FILE_PATH = ''
+HISTORY_FILE_PATH = '~/.rename_history'
+
+# ヒストリの行数を制限します
+MAX_HISTORY_SIZE = 100
+
+Readline.completion_append_character = ''
+Readline.completion_proc = Readline::FILENAME_COMPLETION_PROC
+
+trap('INT') do
+  puts ''
+  exit
+end
+
+def read_history
+  return unless HISTORY_FILE_PATH.size.positive?
+
+  path = File.expand_path(HISTORY_FILE_PATH)
+  return unless File.exist?(path)
+
+  IO.readlines(path).each do |line|
+    Readline::HISTORY.push(line.chomp)
+  end
+end
+
+def write_history
+  return unless HISTORY_FILE_PATH.size.positive?
+
+  path = File.expand_path(HISTORY_FILE_PATH)
+  Readline::HISTORY.shift if Readline::HISTORY.size > MAX_HISTORY_SIZE
+  File.open(path, 'w') do |file|
+    Readline::HISTORY.each do |line|
+      file.puts(line)
+    end
+  end
+end
+
+def info(str)
+  puts "\e[32m#{str}\e[0m"
+end
+
+def warn(str)
+  puts "\e[33m#{str}\e[0m"
+end
+
+def alert(str)
+  puts "\e[31m#{str}\e[0m"
+end
+
+def matched_filelist(path, regex = nil)
+  flist = []
+  Dir.entries(path).select do |entry|
+    stat = File.lstat(File.join(path, entry))
+    stat.file? || stat.symlink?
+  end.sort.each do |fname|
+    if regex
+      flist << fname if fname =~ /#{regex}/
+    else
+      flist << fname
+    end
+  end
+  flist
+end
+
+def main
+  dir   = ''
+  flist = []
+  re    = //
+  to    = ''
+  sep   = File::ALT_SEPARATOR || File::SEPARATOR
+
+  read_history
+
+  info '指定のディレクトリ中のファイルを正規表現で一括リネームします。'
+  info '対象のディレクトリを入力してください。(tabで補完できます)'
+  info '終了する時はCtrl+Cを入力してください。'
+  while (input = Readline.readline('> ', true))
+    next unless input.size.positive?
+
+    write_history
+    path = File.expand_path(input)
+    if Dir.exist?(path)
+      dir = path.chomp(sep)
+      flist = matched_filelist(dir)
+      if flist.size.positive?
+        info "#{flist.size}個のファイルがあります。"
+      else
+        warn 'ファイルがありません。'
+      end
+      break
+    else
+      warn '指定のディレクトリが見つかりません。'
+    end
+  end
+
+  info '対象のファイル名を正規表現で入力してください。'
+  info '可変部を括弧で囲います。'
+  info '    e.g. pji_(.+?)\\.webp'
+  info '何も入力せずEnterするとリストを表示します'
+  while (input = Readline.readline('> ', true))
+    if input.size.positive?
+      write_history
+      re = input
+      flist = matched_filelist(dir, re)
+      if flist.size.positive?
+        info "#{flist.size} 個の対象ファイルがあります。"
+        break
+      else
+        warn '対象のファイルがありません。'
+      end
+    else
+      flist.each do |f|
+        puts "  #{f}"
+      end
+    end
+  end
+
+  info 'リネーム後のファイル名を入力してください。'
+  info '\\1〜\\9を使えます。'
+  info '    e.g. image\\1.webp'
+  while (input = Readline.readline('> ', true))
+    next unless input.size.positive?
+
+    write_history
+    to = input
+    break
+  end
+
+  info "#{flist.size}個のファイルをリネームします。"
+  flist.each do |f|
+    warn "#{f} -> #{f.gsub(Regexp.new(re), to)}"
+  end
+
+  info 'よろしければyを入力してください。'
+  print '> '
+  input = gets.chomp
+  return unless input == 'y'
+
+  flist.each do |f|
+    File.rename(File.join(dir, f), File.join(dir, f.gsub(Regexp.new(re), to)))
+    puts "#{File.join(dir, f)} -> #{File.join(dir, f.gsub(Regexp.new(re), to))}"
+  end
+
+  write_history
+end
+
+main

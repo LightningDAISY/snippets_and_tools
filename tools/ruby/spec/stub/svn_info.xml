@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<info>
+<entry
+   path="index1.html"
+   revision="35"
+   kind="file">
+<url>file:///var/repo/svn/exaple_repo/trunk/index1.html</url>
+<relative-url>^/trunk/index1.html</relative-url>
+<repository>
+<root>file:///var/repo/svn/exaple_repo</root>
+<uuid>27fe69b4-8790-4b0c-9385-d17efe54bcc2</uuid>
+</repository>
+<commit
+   revision="35">
+<author>nacci</author>
+<date>2021-07-29T16:49:32.570151Z</date>
+</commit>
+</entry>
+</info>

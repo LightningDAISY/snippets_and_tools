@@ -1,0 +1,30 @@
+------------------------------------------------------------------------
+r1132 | user1 | 2021-07-31 11:00:00 +0900 (土, 31  7月 2021) | 3 lines
+Changed paths:
+   M /trunk
+   M /trunk/index1.html
+   M /trunk/index2.html
+
+merged
+
+
+------------------------------------------------------------------------
+r1131 | user1 | 2021-07-31 10:00:00 +0900 (土, 31  7月 2021) | 3 lines
+Changed paths:
+   M /
+   A /index1.html (from /branches/brx/index1.html:32)
+   M /trunk
+   A /trunk/index1.html (from /branches/brx/index1.html:32)
+
+fixed
+
+
+------------------------------------------------------------------------
+r1130 | user1 | 2021-07-30 09:00:00 +0900 (土, 31  7月 2021) | 3 lines
+Changed paths:
+   A /branches/brx/index1.html
+
+add index1.html
+
+
+------------------------------------------------------------------------

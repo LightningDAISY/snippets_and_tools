@@ -1,0 +1,9 @@
+#! /usr/bin/env ruby
+
+$:.unshift File.dirname(__FILE__) + "/../lib"
+require "cl/rfind"
+
+CL::RFind.new.find
+
+
+
