@@ -1,0 +1,16 @@
+#! /usr/bin/env ruby
+
+changed_files = `git status --porcelain`.lines
+                 .select { |line| line.match?(/^[AM].*\.rb$/) }
+                 .map { |line| line.split.last }
+
+unless changed_files.empty?
+  changed_files.each do |file|
+    puts ""
+    puts "\e[36m#{file}\e[0m"
+    system("bundle exec rubocop #{file}")
+  end
+else
+  puts "\e[31mNo Ruby files changed.\e[0m"
+end
+
