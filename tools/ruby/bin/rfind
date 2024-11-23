@@ -3,7 +3,11 @@
 $:.unshift File.dirname(__FILE__) + "/../lib"
 require "cl/rfind"
 
-CL::RFind.new.find
+begin
+  CL::RFind.new.find
+rescue StandardError => e
+  puts e.message
+end
 
 
 
